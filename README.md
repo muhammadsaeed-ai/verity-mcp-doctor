@@ -9,6 +9,8 @@
   <sub>Find configuration, startup, protocol-handshake, and tool-catalogue problems before debugging the client application.</sub>
 </p>
 
+<p align="center"><sub>Built and maintained by <a href="https://verityagent.lovable.app"><strong>VerityAgent</strong></a> · AI agents, automation, and developer tools</sub></p>
+
 <p align="center">
   <a href="#quick-start">Quick start</a> ·
   <a href="#visual-system-guide">Visual system guide</a> ·

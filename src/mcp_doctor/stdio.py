@@ -26,7 +26,7 @@ _META_VERSION = "io.modelcontextprotocol/protocolVersion"
 _META_CLIENT = "io.modelcontextprotocol/clientInfo"
 _META_CAPABILITIES = "io.modelcontextprotocol/clientCapabilities"
 _META_SERVER = "io.modelcontextprotocol/serverInfo"
-_END = object()
+_END = object()\n_OVERSIZE = object()
 
 
 @dataclass
@@ -66,7 +66,7 @@ class StdioProcess:
             env=env,
             shell=False,
         )
-        self.stdout_queue: queue.Queue[Any] = queue.Queue()
+        self.stdout_queue: queue.Queue[Any] = queue.Queue(maxsize=64)
         self.stderr_bytes = 0
         self._stderr_lock = threading.Lock()
         self._stdout_thread = threading.Thread(target=self._read_stdout, daemon=True)
@@ -79,7 +79,13 @@ class StdioProcess:
     def _read_stdout(self) -> None:
         assert self.process.stdout is not None
         try:
-            for line in self.process.stdout:
+            while True:
+                line = self.process.stdout.readline(self.max_message_bytes + 2)
+                if not line:
+                    break
+                if len(line.encode("utf-8", errors="replace")) > self.max_message_bytes:
+                    self.stdout_queue.put(_OVERSIZE)
+                    return
                 self.stdout_queue.put(line)
         except (OSError, ValueError):
             pass
@@ -126,6 +132,8 @@ class StdioProcess:
                 raise TimeoutError(f"timed out waiting for response to {method}") from exc
             if entry is _END:
                 raise EOFError("server closed stdout before replying")
+            if entry is _OVERSIZE:
+                raise OverflowError("server stdout message exceeds configured byte limit")
             if len(entry.encode("utf-8", errors="replace")) > self.max_message_bytes:
                 raise OverflowError("server stdout message exceeds configured byte limit")
             try:
@@ -169,11 +177,12 @@ class StdioProcess:
                 self.process.wait(timeout=0.7)
             except subprocess.TimeoutExpired:
                 self.process.kill()
-                self.process.wait(timeout=0.7)
+                try:
+                    self.process.wait(timeout=0.7)
+                except subprocess.TimeoutExpired:
+                    pass
         self._stdout_thread.join(timeout=0.2)
         self._stderr_thread.join(timeout=0.2)
-        with self._stderr_lock:
-            self.stderr_bytes = self.stderr_bytes
 
 
 class RpcError(Exception):
@@ -182,6 +191,25 @@ class RpcError(Exception):
         self.code = error.get("code")
         self.message = scrub(str(error.get("message", "Unknown JSON-RPC error")), 240)
         super().__init__(f"JSON-RPC error {self.code}: {self.message}")
+
+
+def _safe_server_info(value: Any) -> dict[str, Any]:
+    """Keep only standard, bounded identity fields from an untrusted server."""
+    if not isinstance(value, dict):
+        return {}
+    safe: dict[str, Any] = {}
+    for key in ("name", "version", "title", "websiteUrl"):
+        field = value.get(key)
+        if isinstance(field, str):
+            safe[key] = scrub(field, 120)
+    return safe
+
+
+def _safe_capabilities(value: Any) -> dict[str, Any]:
+    """Report only which capability groups are advertised, not arbitrary payloads."""
+    if not isinstance(value, dict):
+        return {}
+    return {scrub(str(key), 80): {"advertised": True} for key in list(value.keys())[:30]}
 
 
 def _modern_meta(version: str) -> dict[str, Any]:
@@ -276,10 +304,10 @@ def probe_stdio(config: ServerConfig, timeout: float = 5.0, max_message_bytes: i
             if isinstance(supported, list) and LATEST_PROTOCOL in supported:
                 modern_version = LATEST_PROTOCOL
                 report.protocol_version = LATEST_PROTOCOL
-                report.capabilities = discovery.get("capabilities", {}) if isinstance(discovery.get("capabilities"), dict) else {}
+                report.capabilities = _safe_capabilities(discovery.get("capabilities", {}))
                 meta = discovery.get("_meta", {})
                 server_meta = meta.get(_META_SERVER, {}) if isinstance(meta, dict) else {}
-                report.server_info = server_meta if isinstance(server_meta, dict) else {}
+                report.server_info = _safe_server_info(server_meta)
                 report.findings.append(_finding(
                     "MCPD-PROTO-001", "pass", "Modern MCP discovery succeeded",
                     "server/discover returned a valid capability and version document.",
@@ -331,8 +359,8 @@ def probe_stdio(config: ServerConfig, timeout: float = 5.0, max_message_bytes: i
                     if not isinstance(negotiated, str):
                         raise ValueError("initialize response has no protocolVersion string")
                     report.protocol_version = negotiated
-                    report.server_info = init_result.get("serverInfo", {}) if isinstance(init_result.get("serverInfo"), dict) else {}
-                    report.capabilities = init_result.get("capabilities", {}) if isinstance(init_result.get("capabilities"), dict) else {}
+                    report.server_info = _safe_server_info(init_result.get("serverInfo", {}))
+                    report.capabilities = _safe_capabilities(init_result.get("capabilities", {}))
                     break
                 except RpcError as exc:
                     last_error = exc

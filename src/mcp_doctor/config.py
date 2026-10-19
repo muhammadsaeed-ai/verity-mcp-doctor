@@ -70,7 +70,7 @@ def load_config(path: str | Path) -> ConfigLoad:
     except FileNotFoundError:
         result.findings.append(_finding(
             "MCPD-CFG-001", "error", "Configuration file not found",
-            f"No configuration file exists at {config_path}.",
+            f"No configuration file named {config_path.name!r} exists.",
             "Check the path and try again.",
         ))
         return result

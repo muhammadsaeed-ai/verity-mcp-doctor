@@ -17,4 +17,8 @@ def scrub(value: str, limit: int = 500) -> str:
     result = _PATTERNS[1].sub(lambda m: m.group(1) + _REDACTED, result)
     for pattern in _PATTERNS[2:]:
         result = pattern.sub(_REDACTED, result)
+    # Remove ANSI terminal control sequences and control characters from
+    # untrusted server-provided strings before they reach the console.
+    result = re.sub(r"\x1b\[[0-?]*[ -/]*[@-~]", "", result)
+    result = re.sub(r"[\x00-\x1f\x7f]", " ", result)
     return result if len(result) <= limit else result[:limit] + "…"

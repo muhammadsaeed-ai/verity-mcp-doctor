@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/muhammadsaeed-ai/MCP-Doctor/docs/report.schema.json",
+  "title": "MCP-Doctor diagnostic report",
+  "type": "object",
+  "required": ["schema_version", "tool", "tool_version", "target", "transport", "status", "summary", "protocol", "tools", "timing", "findings"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "tool": {"type": "string"},
+    "tool_version": {"type": "string"},
+    "target": {"type": "string"},
+    "transport": {"type": "string"},
+    "status": {"enum": ["passed", "passed_with_warnings", "failed"]},
+    "summary": {
+      "type": "object",
+      "required": ["errors", "warnings", "passed", "total_findings"],
+      "properties": {
+        "errors": {"type": "integer", "minimum": 0},
+        "warnings": {"type": "integer", "minimum": 0},
+        "passed": {"type": "integer", "minimum": 0},
+        "total_findings": {"type": "integer", "minimum": 0}
+      },
+      "additionalProperties": false
+    },
+    "protocol": {"type": "object"},
+    "tools": {"type": "array", "items": {"type": "object"}},
+    "timing": {"type": "object"},
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["rule_id", "severity", "title", "message", "next_step", "area", "evidence"],
+        "properties": {
+          "rule_id": {"type": "string"},
+          "severity": {"enum": ["error", "warning", "info", "pass"]},
+          "title": {"type": "string"},
+          "message": {"type": "string"},
+          "next_step": {"type": "string"},
+          "area": {"type": "string"},
+          "evidence": {"type": "object"}
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

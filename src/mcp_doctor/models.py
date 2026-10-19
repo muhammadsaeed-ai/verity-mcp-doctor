@@ -1,5 +1,6 @@
 """Stable data models for machine-readable diagnostic reports."""
 from __future__ import annotations
+
 from dataclasses import asdict, dataclass, field
 from typing import Any, Literal
 

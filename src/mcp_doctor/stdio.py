@@ -157,7 +157,7 @@ class StdioProcess:
                 raise RpcError(error)
             result = message_obj.get("result")
             if not isinstance(result, dict):
-                raise ValueError("server response did not contain an object result")
+                raise TypeError("server response did not contain an object result")
             return result
 
     def notify(self, method: str, params: dict[str, Any] | None = None) -> None:
@@ -358,7 +358,7 @@ def probe_stdio(config: ServerConfig, timeout: float = 5.0, max_message_bytes: i
                     }, timeout)
                     negotiated = init_result.get("protocolVersion")
                     if not isinstance(negotiated, str):
-                        raise ValueError("initialize response has no protocolVersion string")
+                        raise TypeError("initialize response has no protocolVersion string")
                     report.protocol_version = negotiated
                     report.server_info = _safe_server_info(init_result.get("serverInfo", {}))
                     report.capabilities = _safe_capabilities(init_result.get("capabilities", {}))
@@ -366,7 +366,7 @@ def probe_stdio(config: ServerConfig, timeout: float = 5.0, max_message_bytes: i
                 except RpcError as exc:
                     last_error = exc
                     continue
-                except (TimeoutError, EOFError, ValueError, BrokenPipeError) as exc:
+                except (TimeoutError, EOFError, ValueError, TypeError, BrokenPipeError) as exc:
                     last_error = exc
                     break
 
@@ -427,7 +427,7 @@ def probe_stdio(config: ServerConfig, timeout: float = 5.0, max_message_bytes: i
             "The server closed stdout before sending the requested response.",
             "Launch the configured command manually in a trusted terminal and inspect startup diagnostics on stderr.",
         ))
-    except (ValueError, BrokenPipeError) as exc:
+    except (ValueError, TypeError, BrokenPipeError) as exc:
         report.findings.append(_finding(
             "MCPD-PROTO-011", "error", "Invalid stdio protocol response",
             scrub(str(exc), 240),

@@ -4,7 +4,6 @@ from pathlib import Path
 
 from mcp_doctor.diagnostics import check_file
 
-
 FIXTURE_SERVER = Path(__file__).parent / "fixtures" / "fake_mcp_server.py"
 
 

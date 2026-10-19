@@ -24,7 +24,7 @@ class ServerConfig:
     cwd: str | None = None
     source_path: str = ""
 
-    def expanded(self, environ: dict[str, str] | None = None) -> tuple["ServerConfig", list[str]]:
+    def expanded(self, environ: dict[str, str] | None = None) -> tuple[ServerConfig, list[str]]:
         values = os.environ if environ is None else environ
         missing: list[str] = []
 

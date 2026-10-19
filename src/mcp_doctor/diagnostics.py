@@ -1,9 +1,9 @@
 """Orchestrate configuration validation and safe, read-only stdio probes."""
 from __future__ import annotations
 
+import time
 from datetime import datetime, timezone
 from pathlib import Path
-import time
 
 from mcp_doctor import __version__
 from mcp_doctor.config import load_config, validate_runtime_config

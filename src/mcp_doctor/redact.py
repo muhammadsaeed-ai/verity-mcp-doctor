@@ -1,5 +1,6 @@
 """Best-effort secret scrubbing for diagnostic evidence and error messages."""
 from __future__ import annotations
+
 import re
 
 _REDACTED = "<redacted>"

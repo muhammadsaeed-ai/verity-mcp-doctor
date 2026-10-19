@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "fixture-server": {
+      "command": "python",
+      "args": ["-u", "tests/fixtures/fake_mcp_server.py"],
+      "env": {
+        "FAKE_MCP_MODE": "modern"
+      }
+    }
+  }
+}

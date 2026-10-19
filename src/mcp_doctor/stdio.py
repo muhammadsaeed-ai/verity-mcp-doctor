@@ -26,7 +26,8 @@ _META_VERSION = "io.modelcontextprotocol/protocolVersion"
 _META_CLIENT = "io.modelcontextprotocol/clientInfo"
 _META_CAPABILITIES = "io.modelcontextprotocol/clientCapabilities"
 _META_SERVER = "io.modelcontextprotocol/serverInfo"
-_END = object()\n_OVERSIZE = object()
+_END = object()
+_OVERSIZE = object()
 
 
 @dataclass

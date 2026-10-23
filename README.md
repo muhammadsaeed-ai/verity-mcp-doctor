@@ -23,8 +23,8 @@
   <img alt="Python 3.10+" src="https://img.shields.io/badge/python-3.10%2B-3776AB?style=flat-square" />
   <img alt="Zero runtime dependencies" src="https://img.shields.io/badge/runtime%20deps-zero-16a34a?style=flat-square" />
   <img alt="MIT license" src="https://img.shields.io/badge/license-MIT-0d9488?style=flat-square" />
-  <a href="https://github.com/muhammadsaeed-ai/MCP-Doctor/actions/workflows/ci.yml"><img alt="CI" src="https://img.shields.io/github/actions/workflow/status/muhammadsaeed-ai/MCP-Doctor/ci.yml?branch=main&style=flat-square" /></a>
-  <a href="https://github.com/muhammadsaeed-ai/MCP-Doctor/actions/workflows/readme-visuals.yml"><img alt="Animated README visual build" src="https://img.shields.io/github/actions/workflow/status/muhammadsaeed-ai/MCP-Doctor/readme-visuals.yml?branch=main&label=visual%20build&style=flat-square" /></a>
+  <a href="https://github.com/muhammadsaeed-ai/verity-mcp-doctor/actions/workflows/ci.yml"><img alt="CI" src="https://img.shields.io/github/actions/workflow/status/muhammadsaeed-ai/MCP-Doctor/ci.yml?branch=main&style=flat-square" /></a>
+  <a href="https://github.com/muhammadsaeed-ai/verity-mcp-doctor/actions/workflows/readme-visuals.yml"><img alt="Animated README visual build" src="https://img.shields.io/github/actions/workflow/status/muhammadsaeed-ai/MCP-Doctor/readme-visuals.yml?branch=main&label=visual%20build&style=flat-square" /></a>
   <img alt="Stage Alpha" src="https://img.shields.io/badge/stage-alpha-f59e0b?style=flat-square" />
 </p>
 
@@ -63,7 +63,7 @@ MCP clients depend on multiple layers working together: configuration, executabl
 Requires Python 3.10 or newer.
 
 ```bash
-git clone https://github.com/muhammadsaeed-ai/MCP-Doctor.git
+git clone https://github.com/muhammadsaeed-ai/verity-mcp-doctor.git
 cd MCP-Doctor
 python -m pip install -e .
 ```

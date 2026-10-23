@@ -5,7 +5,7 @@ import re
 
 _REDACTED = "<redacted>"
 _PATTERNS: tuple[re.Pattern[str], ...] = (
-    re.compile(r"(?i)(\b(?:api[_-]?key|access[_-]?token|refresh[_-]?token|client[_-]?secret|password|passwd|authorization|bearer|private[_-]?key)\b\s*[:=]\s*)([^\s,;]+)"),
+    re.compile(r"(?i)(\b(?:api[_-]?key|api[_-]?token|id[_-]?token|jwt|token|access[_-]?token|refresh[_-]?token|client[_-]?secret|password|passwd|authorization|bearer|private[_-]?key)\b\s*[:=]\s*)([^\s,;]+)"),
     re.compile(r"(?i)(\bBearer\s+)([A-Za-z0-9._~+/=-]{8,})"),
     re.compile(r"\b(?:gh[pousr]_[A-Za-z0-9_]{20,}|github_pat_[A-Za-z0-9_]{20,})\b"),
     re.compile(r"\bsk_(?:live|test)_[A-Za-z0-9_-]{8,}\b"),
